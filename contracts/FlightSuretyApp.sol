@@ -1,4 +1,4 @@
-pragma solidity ^0.4.25;
+pragma solidity  >=0.4.24;
 
 // It's important to avoid vulnerabilities due to numeric overflow bugs
 // OpenZeppelin's SafeMath library, when used correctly, protects agains such bugs
@@ -26,16 +26,10 @@ contract FlightSuretyApp {
 
     address private contractOwner;          // Account used to deploy contract
 
-    struct Flight {
-        bool isRegistered;
-        uint8 statusCode;
-        uint256 updatedTimestamp;        
-        address airline;
-    }
-    mapping(bytes32 => Flight) private flights;
+    FlightSuretyData    flightSuretyData;
 
  
-    /********************************************************************************************/
+    /**** ************************************************************************************/
     /*                                       FUNCTION MODIFIERS                                 */
     /********************************************************************************************/
 
@@ -73,10 +67,13 @@ contract FlightSuretyApp {
     */
     constructor
                                 (
+                                	address dataContract
                                 ) 
                                 public 
     {
         contractOwner = msg.sender;
+        flightSuretyData = FlightSuretyData(dataContract);
+        flightSuretyData.registerAirline(msg.sender, "AC");
     }
 
     /********************************************************************************************/
@@ -131,7 +128,7 @@ contract FlightSuretyApp {
     function processFlightStatus
                                 (
                                     address airline,
-                                    string memory flight,
+                                    string flight,
                                     uint256 timestamp,
                                     uint8 statusCode
                                 )
@@ -335,3 +332,7 @@ contract FlightSuretyApp {
 // endregion
 
 }   
+
+interface FlightSuretyData{
+	function registerAirline (address addressAirline, string nameAirline) external;
+}

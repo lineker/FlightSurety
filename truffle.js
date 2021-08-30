@@ -3,17 +3,22 @@ var mnemonic = "candy maple cake sugar pudding cream honey rich smooth crumble s
 
 module.exports = {
   networks: {
-    development: {
-      provider: function() {
-        return new HDWalletProvider(mnemonic, "http://127.0.0.1:8545/", 0, 50);
-      },
-      network_id: '*',
-      gas: 9999999
-    }
+    develop: {
+      port: 8545,
+      gas: 6721975,           // Gas sent with each transaction (default: ~6700000)
+      gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
+    },
   },
   compilers: {
     solc: {
-      version: "^0.4.24"
+      version: "^0.4.24",
+      settings: {          // See the solidity docs for advice about optimization and evmVersion
+       optimizer: {
+         enabled: true, // Default: false
+         runs: 1000 // Default: 200
+       },
+       evmVersion: "byzantium" // Default: "byzantium"
+      }
     }
   }
-};
+}
