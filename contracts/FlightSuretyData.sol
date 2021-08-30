@@ -19,7 +19,7 @@ contract FlightSuretyData {
         string airlineName;
         uint256 fund;
     }
-    mapping(address => uint8) private airlines;
+    mapping(address => Airline) private airlines;
     
     struct Flight {
         bool isRegistered;
@@ -64,7 +64,7 @@ contract FlightSuretyData {
                                 public 
     {
         contractOwner = msg.sender;
-        authorizeContract(contractOwner);
+        authorizedContracts[contractOwner] = 1;
     }
     
      /**
@@ -298,7 +298,7 @@ contract FlightSuretyData {
                                 uint256 amountPaid
                             )
                             external
-                            isCallerAuthorized
+                            requireIsCallerAuthorized
                             requireIsOperational
     {
         airlines[addressAirline].isActive = true;
@@ -312,11 +312,11 @@ contract FlightSuretyData {
                                     address airline
                                 )
                                 external
-                                isCallerAuthorized
+                                requireIsCallerAuthorized
                             	requireIsOperational
     {
     
-    	require(flights[flightkey] != true , "Flight already registered");
+    	require(flights[flightkey].isRegistered != true , "Flight already registered");
         
 		bytes32 flightkey = getFlightKey(msg.sender, flight, timestamp);
         
@@ -369,9 +369,8 @@ contract FlightSuretyData {
 
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
-    *      resulting in insurance payouts, the contract should be self-sustaining
-    *
-    */   
+    *      resulting in insurance payouts, the contract    should be self-sustaining
+       */   
     function fund
                             (   
                             )
