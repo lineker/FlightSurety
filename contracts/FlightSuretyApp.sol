@@ -181,7 +181,18 @@ contract FlightSuretyApp {
         }
     }
 
-
+    function viewFlightStatus
+                            (
+                                string flight,
+                                address airline
+                            )
+                            external
+                            view
+                            returns(uint8)
+    {
+            bytes32 key = keccak256(abi.encodePacked(flight, airline));
+            return flights[key].statusCode;
+    }
 
     // Generate a request for oracles to fetch flight information
     function fetchFlightStatus
@@ -203,6 +214,14 @@ contract FlightSuretyApp {
 
         emit OracleRequest(index, airline, flight, timestamp);
     } 
+
+    function withdrawCredit ()
+                            public
+                            requireIsOperational
+                            returns (uint256, uint256, uint256, uint256, address, address)
+    {
+        return (flightSuretyData.withdraw(msg.sender));
+    }
 
 
 // region ORACLE MANAGEMENT
