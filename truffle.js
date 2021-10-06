@@ -3,10 +3,12 @@ var mnemonic = "candy maple cake sugar pudding cream honey rich smooth crumble s
 
 module.exports = {
   networks: {
-    develop: {
+    development: {
+      host: "127.0.0.1",
       port: 8545,
       gas: 6721975,           // Gas sent with each transaction (default: ~6700000)
       gasPrice: 20000000000,  // 20 gwei (in wei) (default: 100 gwei)
+      network_id: "*" // Match any network id
     },
   },
   compilers: {
