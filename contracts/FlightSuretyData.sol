@@ -19,6 +19,7 @@ contract FlightSuretyData {
         bool isActive;
         uint256 fund;
     }
+
     address[] public airlineAccts = new address[](0);
     mapping(address => Airline) private airlines;
 
@@ -26,6 +27,7 @@ contract FlightSuretyData {
         address passengerWallet;
         mapping(string => uint256) boughtFlight;
         uint256 credit;
+
     }
     mapping(address => Passenger) private passengers;
     address[] public passengerAddresses;
@@ -254,6 +256,7 @@ contract FlightSuretyData {
     /**
     * @dev Gets specific element / address from airlines mapping!
     */    
+
     function getAirlines() external view requireIsOperational returns(address[] memory) {
         return airlineAccts;
     }
@@ -265,6 +268,7 @@ contract FlightSuretyData {
                         view
                         returns (bool) {
         return airlines[account].isRegistered;
+
     }
 
     function isAirlineActive (
@@ -370,9 +374,8 @@ contract FlightSuretyData {
 
    /**
     * @dev Initial funding for the insurance. Unless there are too many delayed flights
-    *      resulting in insurance payouts, the contract should be self-sustaining
-    *
-    */   
+    *      resulting in insurance payouts, the contract    should be self-sustaining
+       */   
     function fund
                             (
                                 address account
