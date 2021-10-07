@@ -24,19 +24,13 @@ let STATUS_CODE_LATE_WEATHER = 30;
 let STATUS_CODE_LATE_TECHNICAL = 40;
 let STATUS_CODE_LATE_OTHER = 50;
 
-let defaultStatus = STATUS_CODE_ON_TIME;
+let defaultStatus = STATUS_CODE_LATE_AIRLINE;
 
 const app = express();
 app.use(cors());
 
 app.listen(80, function () {
-  console.log('CORS-enabled web server listening on port 80')
-})
-
-app.get('/api', (req, res) => {
-  res.send({
-    message: 'An API for use with your Dapp!'
-  })
+  console.log('Oracles web server listening on port 80')
 })
 
 app.get('/api/status/:status', (req, res) => {
@@ -82,7 +76,7 @@ flightSuretyApp.events.OracleRequest({
     } 
     console.log(event);
     let index = event.returnValues.index;
-    console.log(`Triggered index: ${index}`);
+    //console.log(`Triggered index: ${index}`);
     let idx = 0;
     oraclesIndexList.forEach((indexes) => {
       let oracle = oracleAccounts[idx];
@@ -106,18 +100,6 @@ flightSuretyData.events.allEvents({
   }
 });
 
-// flightSuretyData.events.Credited({
-//   fromBlock: "latest"
-// }, function (error, event) {
-//   if (error){
-//     console.log("error");
-//     console.log(error);
-//   }  else {
-//     console.log("Credited event:");
-//     console.log(event);
-//   }
-// });
-
 function submitOracleResponse (oracle, index, airline, flight, timestamp) {
   let payload = {
     index: index,
@@ -135,18 +117,6 @@ function submitOracleResponse (oracle, index, airline, flight, timestamp) {
       console.log(error, payload);
     }
   });
-
-  if(defaultStatus == STATUS_CODE_LATE_AIRLINE){
-    flightSuretyData.methods.creditInsurees(flight).call({ from: oracle}, (error, result) => {
-      if(error){
-        console.log(error, payload);
-      } else {
-        console.log("Credit set for insurees");
-        // console.log(payload);
-        // console.log(result);
-      }
-    });
-  }
 }
 
 function getOracleAccounts() {

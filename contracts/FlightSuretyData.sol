@@ -62,7 +62,36 @@ contract FlightSuretyData {
         contractOwner = msg.sender;
         authorizedContracts[msg.sender] = 1;
         airlines[contractOwner] = Airline({isRegistered: true, isActive: true, fund: 0});
+        // airlines[parseAddr("0xFFcf8FDEE72ac11b5c542428B35EEF5769C409f0")] = Airline({isRegistered: true, isActive: true, fund: 0});
         airlineAccts.push(contractOwner);
+    }
+
+    function parseAddr(string memory _a) internal pure returns (address _parsedAddress) {
+        bytes memory tmp = bytes(_a);
+        uint160 iaddr = 0;
+        uint160 b1;
+        uint160 b2;
+        for (uint i = 2; i < 2 + 2 * 20; i += 2) {
+            iaddr *= 256;
+            b1 = uint160(uint8(tmp[i]));
+            b2 = uint160(uint8(tmp[i + 1]));
+            if ((b1 >= 97) && (b1 <= 102)) {
+                b1 -= 87;
+            } else if ((b1 >= 65) && (b1 <= 70)) {
+                b1 -= 55;
+            } else if ((b1 >= 48) && (b1 <= 57)) {
+                b1 -= 48;
+            }
+            if ((b2 >= 97) && (b2 <= 102)) {
+                b2 -= 87;
+            } else if ((b2 >= 65) && (b2 <= 70)) {
+                b2 -= 55;
+            } else if ((b2 >= 48) && (b2 <= 57)) {
+                b2 -= 48;
+            }
+            iaddr += (b1 * 16 + b2);
+        }
+        return address(iaddr);
     }
 
     /********************************************************************************************/
@@ -94,13 +123,13 @@ contract FlightSuretyData {
 
     modifier requireRegisteredAirline()
     {
-        require(airlines[msg.sender].isRegistered, "Caller is not a registered airline");
+        require(airlines[msg.sender].isRegistered || msg.sender == contractOwner, "Caller is not a registered airline");
         _;
     }
 
     modifier requireActiveAirline()
     {
-        require(airlines[msg.sender].isActive, "Caller is not a active airline");
+        //require(airlines[msg.sender].isActive || msg.sender == contractOwner, "Caller is not a active airline");
         _;
     }
 
@@ -259,6 +288,10 @@ contract FlightSuretyData {
 
     function getAirlines() external view requireIsOperational returns(address[] memory) {
         return airlineAccts;
+    }
+
+    function getOwner() external view returns(address) {
+        return contractOwner;
     }
 
     function isAirline (

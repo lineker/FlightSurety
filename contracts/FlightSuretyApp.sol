@@ -26,7 +26,7 @@ contract FlightSuretyApp {
 
     address private contractOwner;          // Account used to deploy contract
 
-    FlightSuretyData    flightSuretyData;
+    IFlightSuretyData    flightSuretyData;
 
     struct Flight {
         bool isRegistered;
@@ -81,7 +81,7 @@ contract FlightSuretyApp {
                                 public 
     {
         contractOwner = msg.sender;
-        flightSuretyData = FlightSuretyData(dataContract);
+        flightSuretyData = IFlightSuretyData(dataContract);
     }
 
     /********************************************************************************************/
@@ -114,8 +114,8 @@ contract FlightSuretyApp {
 
   
    /**
-    * @dev Add an airline to the registration queue
-    *
+    * @dev Add an airline to the registration queue 
+    * requireIsAirlineActive
     */   
     function registerAirline
                             (   
@@ -123,11 +123,15 @@ contract FlightSuretyApp {
                             )
                             public
                             requireIsOperational
-                            requireIsAirlineActive
+                            
     {
         flightSuretyData.registerAirline(account);
     }
 
+    function getAirlines() external view requireIsOperational returns(address[] memory)
+    {
+        return flightSuretyData.getAirlines();
+    }
 
    /**
     * @dev Register a future flight for insuring.
@@ -140,7 +144,6 @@ contract FlightSuretyApp {
                                 )
                                 external
                                 requireIsOperational
-                                requireIsAirlineActive
     {
         bytes32 key = keccak256(abi.encodePacked(flight, msg.sender));
         require(!flights[key].isRegistered, "Flight is already registered.");
@@ -214,7 +217,7 @@ contract FlightSuretyApp {
     uint256 public constant REGISTRATION_FEE = 1 ether;
 
     // Number of oracles that must respond for valid status
-    uint256 private constant MIN_RESPONSES = 3;
+    uint256 private constant MIN_RESPONSES = 1;
 
 
     struct Oracle {
@@ -362,7 +365,7 @@ contract FlightSuretyApp {
                             internal
                             returns (uint8)
     {
-        uint8 maxValue = 10;
+        uint8 maxValue = 3;
 
         // Pseudo random number...the incrementing nonce adds variation
         uint8 random = uint8(uint256(keccak256(abi.encodePacked(blockhash(block.number - nonce++), account))) % maxValue);
@@ -378,7 +381,8 @@ contract FlightSuretyApp {
 
 }   
 
-contract FlightSuretyData{
+contract IFlightSuretyData{
+    function getAirlines() external view returns(address[] memory);
 	function registerAirline (address account) external;
     function isOperational() public view returns(bool);
     function isActive ( address airline) public view returns(bool);
